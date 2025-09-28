@@ -1,0 +1,5 @@
+add_subdirectory(bitmap_fonts)
+add_subdirectory(hershey_fonts)
+add_subdirectory(pico_graphics)
+add_subdirectory(tufty2040)
+add_subdirectory(pngdec)
