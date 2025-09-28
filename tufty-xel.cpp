@@ -1,10 +1,10 @@
 #include "pico/stdlib.h"
 #include <stdio.h>
 #include <iostream>
-#include <string>
-#include <vector>
-#include <algorithm>
-#include <chrono>
+// #include <string>
+// #include <vector>
+// #include <algorithm>
+// #include <chrono>
 #include "pico/time.h"
 #include "pico/platform.h"
 
@@ -13,12 +13,9 @@
 #include "drivers/button/button.hpp"
 #include "libraries/pico_graphics/pico_graphics.hpp"
 #include "libraries/tufty2040/tufty2040.hpp"
-#include "libraries/pngdec/PNGdec.h"
-#include "include/images/bearIconPngSmall.h"
-#include "include/images/bearIconPng.h"
-#include "include/images/octocat.h"
-#include "include/images/octocat_8bpp.h"
-
+// #include "libraries/pngdec/PNGdec.h"
+// #include "include/images/bearIcon100x100.h"
+// #include "include/images/bearIcon200x200.h"
 
 using namespace pimoroni;
 
@@ -26,7 +23,7 @@ using namespace pimoroni;
 // input range is 3v - 5.5v
 
 Tufty2040 tufty;
-PNG png;
+// PNG png;
 
 ST7789 st7789(
   Tufty2040::WIDTH,
@@ -131,105 +128,111 @@ auto shapesDemo(PicoGraphics_PenRGB556& graphics) -> void {
   }
 }
 
-auto centerText(PicoGraphics_PenRGB556& graphics, textRenderInfo& textRenderInfo, int scrWidth) -> void {
-  // FIXME: rendering this isnt working as expected cout the values and check tomoz, maybe hersshey needs something special?
-  auto textWidth = graphics.measure_text(textRenderInfo.text, textRenderInfo.scale, textRenderInfo.spacing, false);
-  textRenderInfo.pos.x = (scrWidth * 0.5f) - (textWidth * 0.5f);
-}
+// auto centerText(PicoGraphics_PenRGB556& graphics, textRenderInfo& textRenderInfo, int scrWidth) -> void {
+//   // FIXME: rendering this isnt working as expected cout the values and check tomoz, maybe hersshey needs something special?
+//   auto textWidth = graphics.measure_text(textRenderInfo.text, textRenderInfo.scale, textRenderInfo.spacing, false);
+//   textRenderInfo.pos.x = (scrWidth * 0.5f) - (textWidth * 0.5f);
+// }
 
-auto drawBackground(PicoGraphics_PenRGB556& graphics) -> void {
-    graphics.set_pen(bearFleshPen);
-    graphics.clear();
+// auto drawBackground(PicoGraphics_PenRGB556& graphics) -> void {
+//     graphics.set_pen(bearFleshPen);
+//     graphics.clear();
 
 
-    int screenWidth = graphics.bounds.w;
-    int screenHeight = graphics.bounds.h;
+//     int screenWidth = graphics.bounds.w;
+//     int screenHeight = graphics.bounds.h;
 
-    graphics.set_pen(bearNosePen);
+//     graphics.set_pen(bearNosePen);
 
-    // Middle Base
-    graphics.circle(Point{screenWidth/2, -40}, 100);
+//     // Middle Base
+//     graphics.circle(Point{screenWidth/2, -40}, 100);
 
-    // Side beans
-    graphics.circle(Point{screenWidth/2 - (screenWidth/4 + 20), 80}, 50);
-    graphics.circle(Point{screenWidth/2 + (screenWidth/4 + 20), 80}, 50);
+//     // Side beans
+//     graphics.circle(Point{screenWidth/2 - (screenWidth/4 + 20), 80}, 50);
+//     graphics.circle(Point{screenWidth/2 + (screenWidth/4 + 20), 80}, 50);
 
-    // upper Bean
-    graphics.circle(Point{screenWidth/2, 120}, 50);
-}
+//     // upper Bean
+//     graphics.circle(Point{screenWidth/2, 120}, 50);
+// }
 
-auto pngDrawCallback(PNGDRAW* pDraw) -> int {
-  imageRenderInfo* pngInfo = reinterpret_cast<imageRenderInfo*>(pDraw->pUser);
+// auto pngDrawCallback(PNGDRAW* pDraw) -> int {
+//   imageRenderInfo* pngInfo = reinterpret_cast<imageRenderInfo*>(pDraw->pUser);
 
-  std::vector<uint16_t> lineBuffer;
-  lineBuffer.resize(pDraw->iWidth * sizeof(uint16_t));
-  png.getLineAsRGB565(pDraw, lineBuffer.data(), PNG_RGB565_BIG_ENDIAN, 0xffffffff);
+//   std::vector<uint16_t> lineBuffer;
+//   lineBuffer.resize(pDraw->iWidth * sizeof(uint16_t));
+//   png.getLineAsRGB565(pDraw, lineBuffer.data(), PNG_RGB565_BIG_ENDIAN, 0xffffffff);
 
-  uint16_t* currentPixel = lineBuffer.data();
-  for(int x = 0; x < pDraw->iWidth; ++x) {
-    // auto rgbVal = RGB(RGB565(*pixel));
-    auto rgbVal = RGB565(*currentPixel);
-    graphics.set_pixel_dither(Point{pngInfo->x + x, pngInfo->y + pngInfo->y + pDraw->y}, rgbVal);
-    ++currentPixel;
-  }
+//   uint16_t* currentPixel = lineBuffer.data();
+//   for(int x = 0; x < pDraw->iWidth; ++x) {
+    // auto rgbVal = RGB332(RGB565(*currentPixel));
+//     graphics.set_pixel_dither(Point{pngInfo->x + x, pngInfo->y + pngInfo->y + pDraw->y}, rgbVal);
+//     ++currentPixel;
+//   }
   
-  return 1; // For some reason returning a PNG_SUCCESS causes the library to EARLY quit, lowkey dumb but changed to allow for processing of this func
-}
+//   return 1; // For some reason returning a PNG_SUCCESS causes the library to EARLY quit, lowkey dumb but changed to allow for processing of this func
+// }
 
-template<class Resolution, class Step>
-auto timestampDifference(const std::chrono::steady_clock::time_point& before, const std::chrono::steady_clock::time_point& after) -> double {
-  std::chrono::duration<Resolution, Step> delta{after - before};
-  return delta.count();
-}
+// template<class Resolution, class Step>
+// auto timestampDifference(const std::chrono::steady_clock::time_point& before, const std::chrono::steady_clock::time_point& after) -> double {
+//   std::chrono::duration<Resolution, Step> delta{after - before};
+//   return delta.count();
+// }
 
 int main() {
   stdio_init_all();
   st7789.set_backlight(255);
   graphics.set_font("bitmap8");
-  auto pngInfo = imageRenderInfo{0,0};
 
-  int pngOpen = png.openRAM(bigBeawIconPng, sizeof(bigBeawIconPng), pngDrawCallback);
-
-  bool needsRedraw = true;
   while(true) {
-    const auto startTs{std::chrono::steady_clock::now()};
-    auto processingTs{std::chrono::steady_clock::now()};
-    auto renderTs{std::chrono::steady_clock::now()};
-
-    if (needsRedraw) {
-      // drawBackground(graphics);
-      textRenderInfo tInfo{.text = "Xels Tufty"};
-      graphics.set_pen(blackPen);
-      graphics.text(tInfo.text, tInfo.pos, tInfo.wrapPixelCount, tInfo.scale, tInfo.angle, tInfo.spacing);
-
-      if (pngOpen == PNG_SUCCESS) {
-        png.decode(&pngInfo, 0);
-      }
-      processingTs = std::chrono::steady_clock::now();
-      // update screen
-      st7789.update(&graphics);
-      renderTs = std::chrono::steady_clock::now();
-      needsRedraw = false;
-    }
-
-    // FIXME: This borks console output, math is mathin but cant prove it out until I have moving stuff
-    //Force a 1 fps limit to reduce battery drain
-    // static const double forcedMinWaitMs{100e6};
-    // auto delta = forcedMinWaitMs - (renderTs - startTs).count();
-    // if (delta > 0.0) {
-    //   // using namespace std::chrono_literals;
-    //   // std::this_thread::sleep_for(delta * 1ms);
-    //   busy_wait_ms(delta);
-    // }
-    // auto sleepTs{std::chrono::steady_clock::now()};
-
-    std::cout << 
-    "Compute: "   << timestampDifference<double, std::milli>(startTs, processingTs) << 
-    "ms Render: " << timestampDifference<double, std::milli>(processingTs, renderTs) << 
-    // "ms Sleep: "  << timestampDifference<double, std::milli>(renderTs, sleepTs) <<
-    "ms Total: "  << timestampDifference<double, std::milli>(startTs, renderTs) << "ms" << std::endl;
+    shapesDemo(graphics);
+    st7789.update(&graphics);
+    std::cout << "Supposedly looped WAH" << std::endl;
   }
+  
 
-  png.close();
+  // auto pngInfo = imageRenderInfo{0,0};
+  // int pngOpen = png.openRAM(const_cast<uint8_t*>(bearIconAlpha200x200), sizeof(bearIconAlpha200x200), pngDrawCallback);
+
+  // bool needsRedraw = true;
+  // while(true) {
+  //   const auto startTs{std::chrono::steady_clock::now()};
+  //   auto processingTs{std::chrono::steady_clock::now()};
+  //   auto renderTs{std::chrono::steady_clock::now()};
+
+  //   if (needsRedraw) {
+  //     // drawBackground(graphics);
+  //     textRenderInfo tInfo{.text = "Xels Tufty"};
+  //     graphics.set_pen(blackPen);
+  //     graphics.text(tInfo.text, tInfo.pos, tInfo.wrapPixelCount, tInfo.scale, tInfo.angle, tInfo.spacing);
+
+  //     if (pngOpen == PNG_SUCCESS) {
+  //       png.decode(&pngInfo, 0);
+  //     }
+  //     processingTs = std::chrono::steady_clock::now();
+  //     // update screen
+  //     st7789.update(&graphics);
+  //     renderTs = std::chrono::steady_clock::now();
+  //     needsRedraw = false;
+  //   }
+
+  //   // FIXME: This borks console output, math is mathin but cant prove it out until I have moving stuff
+  //   //Force a 1 fps limit to reduce battery drain
+  //   // static const double forcedMinWaitMs{100e6};
+  //   // auto delta = forcedMinWaitMs - (renderTs - startTs).count();
+  //   // if (delta > 0.0) {
+  //   //   // using namespace std::chrono_literals;
+  //   //   // std::this_thread::sleep_for(delta * 1ms);
+  //   //   busy_wait_ms(delta);
+  //   // }
+  //   // auto sleepTs{std::chrono::steady_clock::now()};
+
+  //   std::cout << 
+  //   "Compute: "   << timestampDifference<double, std::milli>(startTs, processingTs) << 
+  //   "ms Render: " << timestampDifference<double, std::milli>(processingTs, renderTs) << 
+  //   // "ms Sleep: "  << timestampDifference<double, std::milli>(renderTs, sleepTs) <<
+  //   "ms Total: "  << timestampDifference<double, std::milli>(startTs, renderTs) << "ms" << std::endl;
+  // }
+
+  // png.close();
   return 0;
 }
