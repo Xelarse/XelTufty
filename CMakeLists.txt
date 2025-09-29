@@ -1,5 +1,3 @@
-# Generated Cmake Pico project file
-
 cmake_minimum_required(VERSION 3.13)
 
 set(PROJECT_NAME tufty-xel)
@@ -50,9 +48,10 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}
 )
 
-# target_sources(${PROJECT_NAME} PRIVATE
-#   ${CMAKE_CURRENT_LIST_DIR}/src/
-# )
+target_sources(${PROJECT_NAME} PRIVATE
+  ${CMAKE_CURRENT_LIST_DIR}/src/shapesDemoLayer.cpp
+  ${CMAKE_CURRENT_LIST_DIR}/src/bearPawBackgroundLayer.cpp
+)
 
 
 target_link_libraries(${PROJECT_NAME}

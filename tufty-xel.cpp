@@ -14,8 +14,11 @@
 #include "libraries/pico_graphics/pico_graphics.hpp"
 #include "libraries/tufty2040/tufty2040.hpp"
 // #include "libraries/pngdec/PNGdec.h"
+
 // #include "include/images/bearIcon100x100.h"
 // #include "include/images/bearIcon200x200.h"
+#include "include/layers/shapesDemoLayer.hpp"
+#include "include/layers/bearPawBackgroundLayer.hpp"
 
 using namespace pimoroni;
 
@@ -39,15 +42,6 @@ ST7789 st7789(
   }
 );
 
-struct shapePoint {
-  float      x;
-  float      y;
-  uint8_t    r;
-  float     dx;
-  float     dy;
-  uint16_t pen;
-};
-
 struct textRenderInfo {
   std::string text = "";
   Point pos{310,100};
@@ -63,12 +57,6 @@ struct imageRenderInfo {
 };
 
 PicoGraphics_PenRGB556 graphics(st7789.width, st7789.height, nullptr);
-Pen bearBasePen = graphics.create_pen(254, 246, 210);
-Pen bearFleshPen = graphics.create_pen(246, 216, 190);
-Pen bearNosePen = graphics.create_pen(186, 145, 99);
-Pen bearDecalLightPen = graphics.create_pen(252, 224, 138);
-Pen bearDecalDarkPen = graphics.create_pen(232, 188, 141);
-Pen blackPen = graphics.create_pen(0, 0, 0);
 
 Button button_a(Tufty2040::A, Polarity::ACTIVE_HIGH);
 Button button_b(Tufty2040::B, Polarity::ACTIVE_HIGH);
@@ -81,78 +69,10 @@ uint32_t time() {
   return to_ms_since_boot(t);
 }
 
-auto getShapes() -> std::vector<shapePoint> {
-  const uint8_t shapeCount = 100;
-  std::vector<shapePoint> out;
-  out.reserve(shapeCount);
-
-  shapePoint shape{};
-  for(size_t i = 0; i < shapeCount; ++i) {
-    shape.x = rand() % graphics.bounds.w;
-    shape.y = rand() % graphics.bounds.h;
-    shape.r = (rand() % 10) + 3;
-    shape.dx = float(rand() % 255) / 64.0f;
-    shape.dy = float(rand() % 255) / 64.0f;
-    shape.pen = graphics.create_pen(rand() % 255, rand() % 255, rand() % 255);
-    out.emplace_back(shape);
-  }
-
-  return std::move(out);
-}
-
-auto shapesDemo(PicoGraphics_PenRGB556& graphics) -> void {
-  static std::vector<shapePoint> shapes = getShapes();
-
-  for(auto& shape : shapes) {
-    shape.x += shape.dx;
-    shape.y += shape.dy;
-    if((shape.x - shape.r) < 0) {
-      shape.dx *= -1;
-      shape.x = shape.r;
-    }
-    if((shape.x + shape.r) >= graphics.bounds.w) {
-      shape.dx *= -1;
-      shape.x = graphics.bounds.w - shape.r;
-    }
-    if((shape.y - shape.r) < 0) {
-      shape.dy *= -1;
-      shape.y = shape.r;
-    }
-    if((shape.y + shape.r) >= graphics.bounds.h) {
-      shape.dy *= -1;
-      shape.y = graphics.bounds.h - shape.r;
-    }
-
-    graphics.set_pen(shape.pen);
-    graphics.circle(Point(shape.x, shape.y), shape.r);
-  }
-}
-
 // auto centerText(PicoGraphics_PenRGB556& graphics, textRenderInfo& textRenderInfo, int scrWidth) -> void {
 //   // FIXME: rendering this isnt working as expected cout the values and check tomoz, maybe hersshey needs something special?
 //   auto textWidth = graphics.measure_text(textRenderInfo.text, textRenderInfo.scale, textRenderInfo.spacing, false);
 //   textRenderInfo.pos.x = (scrWidth * 0.5f) - (textWidth * 0.5f);
-// }
-
-// auto drawBackground(PicoGraphics_PenRGB556& graphics) -> void {
-//     graphics.set_pen(bearFleshPen);
-//     graphics.clear();
-
-
-//     int screenWidth = graphics.bounds.w;
-//     int screenHeight = graphics.bounds.h;
-
-//     graphics.set_pen(bearNosePen);
-
-//     // Middle Base
-//     graphics.circle(Point{screenWidth/2, -40}, 100);
-
-//     // Side beans
-//     graphics.circle(Point{screenWidth/2 - (screenWidth/4 + 20), 80}, 50);
-//     graphics.circle(Point{screenWidth/2 + (screenWidth/4 + 20), 80}, 50);
-
-//     // upper Bean
-//     graphics.circle(Point{screenWidth/2, 120}, 50);
 // }
 
 // auto pngDrawCallback(PNGDRAW* pDraw) -> int {
@@ -183,10 +103,13 @@ int main() {
   st7789.set_backlight(255);
   graphics.set_font("bitmap8");
 
+  BearPawBackgroundLayer bpb{&graphics};
+  ShapesDemoLayer sdl{&graphics, 20};
+
   while(true) {
-    shapesDemo(graphics);
+    bpb.update();
+    sdl.update();
     st7789.update(&graphics);
-    std::cout << "Supposedly looped WAH" << std::endl;
   }
   
 
