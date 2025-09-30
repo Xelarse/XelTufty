@@ -20,4 +20,5 @@ class ImageLayer final : public Xel::Layer {
         PNG png;
         int pngOpenStatus = -1;
         Xel::ImageData lastImageData{};
+        Xel::PositionData lastPositionData{};
 };

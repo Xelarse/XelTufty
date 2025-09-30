@@ -17,8 +17,21 @@ auto ImageLayer::update(Xel::LayerData* layerData) -> void
     if (pngOpenStatus != PNG_SUCCESS) { return; }
 
     // TODO: add struct chain traversal helper when its written
-    if (layerData->type == Xel::LayerDataType::IMAGE) {
-        lastImageData = *(reinterpret_cast<Xel::ImageData*>(layerData));
+    auto currentLayer = layerData;
+
+    while(currentLayer) {
+        switch(currentLayer->type) {
+            case Xel::LayerDataType::IMAGE: {
+                lastImageData = *(reinterpret_cast<Xel::ImageData*>(currentLayer));
+                break;
+            }
+            case Xel::LayerDataType::POSITION: {
+                lastPositionData = *(reinterpret_cast<Xel::PositionData*>(currentLayer));
+                break;
+            }
+        }
+
+        currentLayer = currentLayer->next;
     }
 
     png.decode(reinterpret_cast<void*>(this), 0);
@@ -31,7 +44,6 @@ auto ImageLayer::pngDrawCallback(PNGDRAW *pDraw) -> int
     if (!instance->context) { return 0; }
     if (instance->pngOpenStatus != PNG_SUCCESS) { return 0; }
 
-
     // TODO: Add transparency, boarder and mirroring via the lastImageData settings. 
     std::vector<uint16_t> lineBuffer;
     lineBuffer.resize(pDraw->iWidth * sizeof(uint16_t));
@@ -42,8 +54,8 @@ auto ImageLayer::pngDrawCallback(PNGDRAW *pDraw) -> int
         auto rgbVal = pimoroni::RGB565(*currentPixel);
         instance->context->set_pixel_dither(
             pimoroni::Point{
-                instance->lastImageData.x + x, 
-                instance->lastImageData.y + instance->lastImageData.y + pDraw->y}, 
+                instance->lastPositionData.x + x, 
+                instance->lastPositionData.y + instance->lastPositionData.y + pDraw->y}, 
             rgbVal);
         ++currentPixel;
     }

@@ -6,8 +6,9 @@ namespace Xel {
 
     enum class LayerDataType {
         NONE,
-        INPUT,
-        IMAGE
+        POSITION,
+        IMAGE,
+        INPUT
     };
 
     // Layer data make use of struct chaining, allowing the receiving area if desired to have multiple 
@@ -18,6 +19,13 @@ namespace Xel {
 
         LayerDataType type = LayerDataType::NONE;
         LayerData* next = nullptr;
+    };
+
+    struct PositionData final : public LayerData {
+        ~PositionData() override = default;
+
+        uint16_t x = 0;
+        uint16_t y = 0;
     };
 
     // TODO: break this out into PositionData and ImageData as in future text will also use position
@@ -31,8 +39,6 @@ namespace Xel {
 
         ~ImageData() override = default;
 
-        uint16_t x = 0;
-        uint16_t y = 0;
         MirrorFlags mirrorFlags = MirrorFlags::NONE;
         bool hasTransparency = false;
         bool drawBoarder = false;

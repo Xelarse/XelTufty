@@ -81,16 +81,22 @@ int main()
     ImageLayer bearImage100{&graphics, const_cast<uint8_t*>(bearIconAlpha100x100), sizeof(bearIconAlpha100x100)};
 
 
-    Xel::ImageData bearIconData{};
-    bearIconData.type = Xel::LayerDataType::IMAGE;
-    bearIconData.x = 100;
-    bearIconData.y = 0;
+    Xel::PositionData bearIconPositionData{};
+    Xel::ImageData bearIconImageData{};
+
+    bearIconPositionData.type = Xel::LayerDataType::POSITION;
+    bearIconPositionData.next = reinterpret_cast<Xel::LayerData*>(&bearIconImageData);
+    bearIconPositionData.x = 100;
+    bearIconPositionData.y = 0;
+
+    bearIconImageData.type = Xel::LayerDataType::IMAGE;
+    bearIconImageData.hasTransparency = true;
 
     while (true)
     {
         bpb.update();
-        bearImage200.update(reinterpret_cast<Xel::LayerData*>(&bearIconData));
-        bearImage100.update(reinterpret_cast<Xel::LayerData*>(&bearIconData));
+        bearImage200.update(reinterpret_cast<Xel::LayerData*>(&bearIconPositionData));
+        bearImage100.update(reinterpret_cast<Xel::LayerData*>(&bearIconPositionData));
         sdl.update();
         st7789.update(&graphics);
     }
