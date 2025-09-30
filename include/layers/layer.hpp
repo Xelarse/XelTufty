@@ -3,18 +3,25 @@
 #include "libraries/pico_graphics/pico_graphics.hpp"
 
 namespace Xel {
-    struct LayerData {
-        enum class Type {
-            NONE,
-            INPUT,
-            IMAGE
-        };
 
-        virtual ~LayerData() = default;
-
-        Type type = Type::NONE;
+    enum class LayerDataType {
+        NONE,
+        INPUT,
+        IMAGE
     };
 
+    // Layer data make use of struct chaining, allowing the receiving area if desired to have multiple 
+    // packs of unrelated data for a given layer call
+    // TODO: Make a helper that takes a LayerData::Type and traverses the struct chain to either give the resulting ptr or nullptr
+    struct LayerData {
+        virtual ~LayerData() = default;
+
+        LayerDataType type = LayerDataType::NONE;
+        LayerData* next = nullptr;
+    };
+
+    // TODO: break this out into PositionData and ImageData as in future text will also use position
+    // ALSO make time data to get rid of dt calc
     struct ImageData final : public LayerData {
         enum class MirrorFlags : uint8_t {
             NONE = 0,
@@ -24,10 +31,11 @@ namespace Xel {
 
         ~ImageData() override = default;
 
-        uint16_t xpos = 0;
-        uint16_t ypos = 0;
+        uint16_t x = 0;
+        uint16_t y = 0;
         MirrorFlags mirrorFlags = MirrorFlags::NONE;
         bool hasTransparency = false;
+        bool drawBoarder = false;
 
         /*
             Flag usage
@@ -53,8 +61,7 @@ namespace Xel {
             Layer& operator=(Layer& rhs) = delete;
             Layer&& operator=(Layer&& rhs) = delete;
 
-            // FIXME: C++20 doesnt seem supported so cant use span here
-            virtual auto update(double dt = .0, const std::vector<LayerData*>& layerData = {}) -> void = 0;
+            virtual auto update(LayerData* layerData = nullptr) -> void = 0;
 
         protected:
             Layer(pimoroni::PicoGraphics* gc) : context{gc} {};

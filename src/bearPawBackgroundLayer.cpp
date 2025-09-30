@@ -1,7 +1,7 @@
 #include "include/layers/bearPawBackgroundLayer.hpp"
 #include "include/utilities.hpp"
 
-auto BearPawBackgroundLayer::update(double dt, const std::vector<Xel::LayerData *> &layerData) -> void
+auto BearPawBackgroundLayer::update(Xel::LayerData* layerData) -> void
 {
     if (!context) { return; }
 

@@ -8,7 +8,7 @@ class ShapesDemoLayer final : public Xel::Layer {
         ShapesDemoLayer(pimoroni::PicoGraphics* gc, uint8_t shapeCount);
         ~ShapesDemoLayer() override = default;
 
-        auto update(double dt = .0, const std::vector<Xel::LayerData*>& layerData = {}) -> void override;
+        auto update(Xel::LayerData* layerData = nullptr) -> void override;
 
     private:
         struct shapePoint {

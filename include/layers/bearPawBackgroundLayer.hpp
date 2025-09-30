@@ -7,7 +7,7 @@ class BearPawBackgroundLayer final : public Xel::Layer {
         BearPawBackgroundLayer(pimoroni::PicoGraphics* gc) : Layer{gc} {};
         ~BearPawBackgroundLayer() override = default;
 
-        auto update(double dt = .0, const std::vector<Xel::LayerData*>& layerData = {}) -> void override;
+        auto update(Xel::LayerData* layerData = nullptr) -> void override;
 
     private:
         BearPawBackgroundLayer() = default;

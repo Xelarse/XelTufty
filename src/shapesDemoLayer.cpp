@@ -18,7 +18,7 @@ ShapesDemoLayer::ShapesDemoLayer(pimoroni::PicoGraphics* gc, uint8_t shapeCount)
     }
 }
 
-void ShapesDemoLayer::update(double dt, const std::vector<Xel::LayerData*> &layerData)
+void ShapesDemoLayer::update(Xel::LayerData* layerData)
 {
     if (!context) { return; }
 
