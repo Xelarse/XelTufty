@@ -1,10 +1,4 @@
 #include "pico/stdlib.h"
-#include <stdio.h>
-#include <iostream>
-// #include <string>
-// #include <vector>
-// #include <algorithm>
-// #include <chrono>
 #include "pico/time.h"
 #include "pico/platform.h"
 
@@ -14,11 +8,10 @@
 #include "libraries/pico_graphics/pico_graphics.hpp"
 #include "libraries/tufty2040/tufty2040.hpp"
 
-#include "include/images/bearIcon100x100.h"
 #include "include/images/bearIcon200x200.h"
-#include "include/layers/shapesDemoLayer.hpp"
 #include "include/layers/bearPawBackgroundLayer.hpp"
 #include "include/layers/imageLayer.hpp"
+#include "include/layers/textLayer.hpp"
 
 using namespace pimoroni;
 
@@ -37,17 +30,9 @@ ST7789 st7789(
         Tufty2040::LCD_WR,
         Tufty2040::LCD_RD,
         Tufty2040::LCD_D0,
-        Tufty2040::BACKLIGHT});
-
-struct textRenderInfo
-{
-    std::string text = "";
-    Point pos{310, 100};
-    int wrapPixelCount = 100;
-    float scale = 6.0f;
-    float angle = 180.f;
-    uint8_t spacing = 1;
-};
+        Tufty2040::BACKLIGHT
+    }
+);
 
 PicoGraphics_PenRGB556 graphics(st7789.width, st7789.height, nullptr);
 
@@ -57,81 +42,71 @@ Button button_c(Tufty2040::C, Polarity::ACTIVE_HIGH);
 Button button_up(Tufty2040::UP, Polarity::ACTIVE_HIGH);
 Button button_down(Tufty2040::DOWN, Polarity::ACTIVE_HIGH);
 
-// auto centerText(PicoGraphics_PenRGB556& graphics, textRenderInfo& textRenderInfo, int scrWidth) -> void {
-//   // FIXME: rendering this isnt working as expected cout the values and check tomoz, maybe hersshey needs something special?
-//   auto textWidth = graphics.measure_text(textRenderInfo.text, textRenderInfo.scale, textRenderInfo.spacing, false);
-//   textRenderInfo.pos.x = (scrWidth * 0.5f) - (textWidth * 0.5f);
-// }
+int main()
+{
+    stdio_init_all();
+    st7789.set_backlight(255);
+    
+    Xel::PositionData bearIconPosition{};
+    bearIconPosition.x = 0;
+    bearIconPosition.y = 0;
 
+    Xel::PositionData textPosition{};
+    textPosition.x = 310;
+    textPosition.y = 230;
+
+    Xel::TextData textData{};
+    textData.next = reinterpret_cast<Xel::LayerData*>(&textPosition);
+    textData.text = "Xel";
+    textData.scale = 6.2f;
+    textData.rotation = 180.f;
+
+    BearPawBackgroundLayer bpb{&graphics};
+    ImageLayer bearImage{&graphics, const_cast<uint8_t*>(bearIconAlpha200x200), sizeof(bearIconAlpha200x200)};
+    TextLayer xelText{&graphics, reinterpret_cast<Xel::LayerData*>(&textData)};
+
+    bool needsRedraw = true;
+    while (true)
+    {
+        if (needsRedraw)
+        {
+            bpb.update();
+            bearImage.update(reinterpret_cast<Xel::LayerData*>(&bearIconPosition));
+            xelText.update();
+            st7789.update(&graphics);
+            needsRedraw = false;
+        }
+        // TODO: sleep logic here to save power
+    }
+
+    return 0;
+}
+
+
+// Timer WIP----------------------------------------------
 // template<class Resolution, class Step>
 // auto timestampDifference(const std::chrono::steady_clock::time_point& before, const std::chrono::steady_clock::time_point& after) -> double {
 //   std::chrono::duration<Resolution, Step> delta{after - before};
 //   return delta.count();
 // }
+//
+//     // FIXME: This borks console output, math is mathin but cant prove it out until I have moving stuff
+//     //Force a 1 fps limit to reduce battery drain
+//     static const double forcedMinWaitMs{100e6};
+//     auto delta = forcedMinWaitMs - (renderTs - startTs).count();
+//     if (delta > 0.0) {
+//       using namespace std::chrono_literals;
+//       std::this_thread::sleep_for(delta * 1ms);
+//       busy_wait_ms(delta);
+//     }
+//     auto sleepTs{std::chrono::steady_clock::now()};
 
-int main()
-{
-    stdio_init_all();
-    st7789.set_backlight(255);
-    graphics.set_font("bitmap8");
-
-    BearPawBackgroundLayer bpb{&graphics};
-    ShapesDemoLayer sdl{&graphics, 20};
-    ImageLayer bearImage200{&graphics, const_cast<uint8_t*>(bearIconAlpha200x200), sizeof(bearIconAlpha200x200)};
-    ImageLayer bearImage100{&graphics, const_cast<uint8_t*>(bearIconAlpha100x100), sizeof(bearIconAlpha100x100)};
-
-
-    Xel::PositionData bearIconPositionData{};
-    Xel::ImageData bearIconImageData{};
-
-    bearIconPositionData.type = Xel::LayerDataType::POSITION;
-    bearIconPositionData.next = reinterpret_cast<Xel::LayerData*>(&bearIconImageData);
-    bearIconPositionData.x = 100;
-    bearIconPositionData.y = 0;
-
-    bearIconImageData.type = Xel::LayerDataType::IMAGE;
-    bearIconImageData.hasTransparency = true;
-
-    while (true)
-    {
-        bpb.update();
-        bearImage200.update(reinterpret_cast<Xel::LayerData*>(&bearIconPositionData));
-        bearImage100.update(reinterpret_cast<Xel::LayerData*>(&bearIconPositionData));
-        sdl.update();
-        st7789.update(&graphics);
-    }
-
-    //   bool needsRedraw = true;
-    //   while(true) {
-    //     if (needsRedraw) {
-    //       textRenderInfo tInfo{.text = "Xels Tufty"};
-    //       graphics.set_pen(0,0,0);
-    //       graphics.text(tInfo.text, tInfo.pos, tInfo.wrapPixelCount, tInfo.scale, tInfo.angle, tInfo.spacing);
-    //       // update screen
-    //       st7789.update(&graphics);
-    //       needsRedraw = false;
-    //     }
-
-    //     // FIXME: This borks console output, math is mathin but cant prove it out until I have moving stuff
-    //     //Force a 1 fps limit to reduce battery drain
-    //     static const double forcedMinWaitMs{100e6};
-    //     auto delta = forcedMinWaitMs - (renderTs - startTs).count();
-    //     if (delta > 0.0) {
-    //       // using namespace std::chrono_literals;
-    //       // std::this_thread::sleep_for(delta * 1ms);
-    //       busy_wait_ms(delta);
-    //     }
-    //     auto sleepTs{std::chrono::steady_clock::now()};
-
-    //     const auto startTs{std::chrono::steady_clock::now()};
-    //     auto processingTs{std::chrono::steady_clock::now()};
-    //     auto renderTs{std::chrono::steady_clock::now()};
-    //     std::cout <<
-    //     "Compute: "   << timestampDifference<double, std::milli>(startTs, processingTs) <<
-    //     "ms Render: " << timestampDifference<double, std::milli>(processingTs, renderTs) <<
-    //     // "ms Sleep: "  << timestampDifference<double, std::milli>(renderTs, sleepTs) <<
-    //     "ms Total: "  << timestampDifference<double, std::milli>(startTs, renderTs) << "ms" << std::endl;
-    //   }
-
-    return 0;
-}
+//     const auto startTs{std::chrono::steady_clock::now()};
+//     auto processingTs{std::chrono::steady_clock::now()};
+//     auto renderTs{std::chrono::steady_clock::now()};
+//     std::cout <<
+//     "Compute: "   << timestampDifference<double, std::milli>(startTs, processingTs) <<
+//     "ms Render: " << timestampDifference<double, std::milli>(processingTs, renderTs) <<
+//     "ms Sleep: "  << timestampDifference<double, std::milli>(renderTs, sleepTs) <<
+//     "ms Total: "  << timestampDifference<double, std::milli>(startTs, renderTs) << "ms" << std::endl;
+//   }

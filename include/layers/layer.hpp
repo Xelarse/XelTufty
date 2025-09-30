@@ -1,6 +1,7 @@
 #pragma once
 
 #include "libraries/pico_graphics/pico_graphics.hpp"
+#include "include/utilities.hpp"
 
 namespace Xel {
 
@@ -8,13 +9,15 @@ namespace Xel {
         NONE,
         POSITION,
         IMAGE,
-        INPUT
+        INPUT,
+        TEXT
     };
 
     // Layer data make use of struct chaining, allowing the receiving area if desired to have multiple 
     // packs of unrelated data for a given layer call
     // TODO: Make a helper that takes a LayerData::Type and traverses the struct chain to either give the resulting ptr or nullptr
     struct LayerData {
+        LayerData(LayerDataType t) : type{t}, next{nullptr} {}
         virtual ~LayerData() = default;
 
         LayerDataType type = LayerDataType::NONE;
@@ -22,14 +25,13 @@ namespace Xel {
     };
 
     struct PositionData final : public LayerData {
+        PositionData() : LayerData{LayerDataType::POSITION} {}
         ~PositionData() override = default;
 
         uint16_t x = 0;
         uint16_t y = 0;
     };
 
-    // TODO: break this out into PositionData and ImageData as in future text will also use position
-    // ALSO make time data to get rid of dt calc
     struct ImageData final : public LayerData {
         enum class MirrorFlags : uint8_t {
             NONE = 0,
@@ -37,6 +39,7 @@ namespace Xel {
             MIRROR_Y = 1 << 1
         };
 
+        ImageData() : LayerData{LayerDataType::IMAGE} {}
         ~ImageData() override = default;
 
         MirrorFlags mirrorFlags = MirrorFlags::NONE;
@@ -51,12 +54,26 @@ namespace Xel {
     };
 
     struct InputData final : public LayerData {
+        InputData() : LayerData{LayerDataType::INPUT} {}
         ~InputData() override = default;
         bool a = false;
         bool b = false;
         bool c = false;
         bool up = false;
         bool down = false;
+    };
+
+    // TODO: Maybe break out scale and rotation to do a cheaper per frame update
+    struct TextData final : public LayerData {
+        TextData() : LayerData{LayerDataType::TEXT} {}        
+        ~TextData() override = default;
+        const char* text;
+        const char* font = "bitmap8";
+        int wrapPixelCount = 0;
+        float scale = 1.0f;
+        float rotation = 0.f;
+        uint8_t spacing = 1;
+        Xel::RGB col = {0,0,0};
     };
 
     class Layer {

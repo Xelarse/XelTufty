@@ -1,3 +1,5 @@
+#pragma once
+
 namespace Xel {
     struct RGB {
         uint8_t r;
