@@ -43,8 +43,7 @@ namespace Xel {
         ~ImageData() override = default;
 
         MirrorFlags mirrorFlags = MirrorFlags::NONE;
-        bool hasTransparency = false;
-        bool drawBoarder = false;
+        bool useTransparency = true;
 
         /*
             Flag usage

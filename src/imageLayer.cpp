@@ -44,20 +44,43 @@ auto ImageLayer::pngDrawCallback(PNGDRAW *pDraw) -> int
     if (!instance->context) { return 0; }
     if (instance->pngOpenStatus != PNG_SUCCESS) { return 0; }
 
-    // TODO: Add transparency, boarder and mirroring via the lastImageData settings. 
+    // Fetch the full line relating to this render.
     std::vector<uint16_t> lineBuffer;
     lineBuffer.resize(pDraw->iWidth * sizeof(uint16_t));
     instance->png.getLineAsRGB565(pDraw, lineBuffer.data(), PNG_RGB565_BIG_ENDIAN, 0xffffffff);
-
     uint16_t* currentPixel = lineBuffer.data();
-    for(int x = 0; x < pDraw->iWidth; ++x) {
-        auto rgbVal = pimoroni::RGB565(*currentPixel);
-        instance->context->set_pixel_dither(
-            pimoroni::Point{
-                instance->lastPositionData.x + x, 
-                instance->lastPositionData.y + instance->lastPositionData.y + pDraw->y}, 
-            rgbVal);
-        ++currentPixel;
+
+    // Fetch the bitmask for the full line relating to this render.
+    std::vector<uint8_t> maskBuffer;
+    maskBuffer.resize((pDraw->iWidth * sizeof(uint8_t)) / 8); // Each pixel has 1 bit of mask.
+    instance->png.getAlphaMask(pDraw, maskBuffer.data(), 255);
+    uint8_t* currentMask = maskBuffer.data();
+
+    // TODO: mirroring via the lastImageData settings. 
+    // Draw in byte chunks for the entire line, utilising the mask to know when a pixel is opaque.
+    for (int x = 0; x < pDraw->iWidth; x+=8) {
+        // For this iteration of a byte grab the current mask
+        uint8_t mask = *currentMask;
+
+        // Loop through the entire byte, querying each bit to see if its a opaque; (1=opaque, 0=transparent).
+        for (int iBit = 0; iBit < 8; ++iBit) {
+            // Check the leftmost bit / Most significant bit (MSB) and if set draw.
+            if (!instance->lastImageData.useTransparency || mask & 0x80) {
+                auto rgbVal = pimoroni::RGB565(*currentPixel);
+                instance->context->set_pixel_dither(
+                    pimoroni::Point{
+                        instance->lastPositionData.x + x + iBit,
+                        instance->lastPositionData.y + pDraw->y}, 
+                    rgbVal);
+            }
+
+            // Left shift the bits so that the next bit we want to operate on in the loop is the MSB.
+            mask <<=1;
+            // Increment the pixel that we're working on.
+            ++currentPixel;
+        }
+        // At the end of the byte, increment the mask by a byte to move onto the next set.
+        ++currentMask;
     }
     
     // For some reason returning a PNG_SUCCESS (which is 0) causes the library to EARLY quit, 

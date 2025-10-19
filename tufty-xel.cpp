@@ -74,7 +74,7 @@ int main()
             bearImage.update(reinterpret_cast<Xel::LayerData*>(&bearIconPosition));
             xelText.update();
             st7789.update(&graphics);
-            needsRedraw = false;
+            // needsRedraw = false;
         }
         // TODO: sleep logic here to save power
     }
