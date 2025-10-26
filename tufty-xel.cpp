@@ -44,26 +44,33 @@ Button button_down(Tufty2040::DOWN, Polarity::ACTIVE_HIGH);
 
 int main()
 {
+    using namespace Xel;
+
     stdio_init_all();
     st7789.set_backlight(255);
     
-    Xel::PositionData bearIconPosition{};
+    PositionData bearIconPosition{};
     bearIconPosition.x = 0;
     bearIconPosition.y = 0;
 
-    Xel::PositionData textPosition{};
+    ImageData bearIconImageData{};
+    //TODO work out a better interface for these flags it feels shit to use like this.
+    bearIconImageData.mirrorFlags = static_cast<ImageData::MirrorFlags>(ImageData::MirrorFlags::MIRROR_X | ImageData::MirrorFlags::MIRROR_Y);
+    bearIconImageData.next = reinterpret_cast<LayerData*>(&bearIconPosition);
+
+    PositionData textPosition{};
     textPosition.x = 310;
     textPosition.y = 230;
 
-    Xel::TextData textData{};
-    textData.next = reinterpret_cast<Xel::LayerData*>(&textPosition);
+    TextData textData{};
+    textData.next = reinterpret_cast<LayerData*>(&textPosition);
     textData.text = "Xel";
     textData.scale = 6.2f;
     textData.rotation = 180.f;
 
     BearPawBackgroundLayer bpb{&graphics};
     ImageLayer bearImage{&graphics, const_cast<uint8_t*>(bearIconAlpha200x200), sizeof(bearIconAlpha200x200)};
-    TextLayer xelText{&graphics, reinterpret_cast<Xel::LayerData*>(&textData)};
+    TextLayer xelText{&graphics, reinterpret_cast<LayerData*>(&textData)};
 
     bool needsRedraw = true;
     while (true)
@@ -71,7 +78,7 @@ int main()
         if (needsRedraw)
         {
             bpb.update();
-            bearImage.update(reinterpret_cast<Xel::LayerData*>(&bearIconPosition));
+            bearImage.update(reinterpret_cast<LayerData*>(&bearIconImageData));
             xelText.update();
             st7789.update(&graphics);
             // needsRedraw = false;

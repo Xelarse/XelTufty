@@ -33,10 +33,11 @@ namespace Xel {
     };
 
     struct ImageData final : public LayerData {
-        enum class MirrorFlags : uint8_t {
+        enum MirrorFlags : uint8_t {
             NONE = 0,
-            MIRROR_X = 1 << 0,
-            MIRROR_Y = 1 << 1
+            MIRROR_X = static_cast<uint8_t>(1) << 0,
+            MIRROR_Y = static_cast<uint8_t>(1) << 1,
+            MAX = static_cast<uint8_t>(1) << 7
         };
 
         ImageData() : LayerData{LayerDataType::IMAGE} {}
@@ -44,12 +45,6 @@ namespace Xel {
 
         MirrorFlags mirrorFlags = MirrorFlags::NONE;
         bool useTransparency = true;
-
-        /*
-            Flag usage
-            MirrorFlags flags = MIRROR_X | MIRROR_Y;
-            if (flags & MIRROR_X) {}
-        */
     };
 
     struct InputData final : public LayerData {
