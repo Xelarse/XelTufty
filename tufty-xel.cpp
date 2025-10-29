@@ -8,7 +8,7 @@
 #include "libraries/pico_graphics/pico_graphics.hpp"
 #include "libraries/tufty2040/tufty2040.hpp"
 
-#include "include/images/bearIcon200x200.h"
+#include "include/images/icon240x240.h"
 #include "include/layers/bearPawBackgroundLayer.hpp"
 #include "include/layers/imageLayer.hpp"
 #include "include/layers/textLayer.hpp"
@@ -65,11 +65,11 @@ int main()
     TextData textData{};
     textData.next = reinterpret_cast<LayerData*>(&textPosition);
     textData.text = "Xel";
-    textData.scale = 6.2f;
+    textData.scale = 6.8f;
     textData.rotation = 180.f;
 
     BearPawBackgroundLayer bpb{&graphics};
-    ImageLayer bearImage{&graphics, const_cast<uint8_t*>(bearIconAlpha200x200), sizeof(bearIconAlpha200x200)};
+    ImageLayer bearImage{&graphics, const_cast<uint8_t*>(Icon240x240), sizeof(Icon240x240)};
     TextLayer xelText{&graphics, reinterpret_cast<LayerData*>(&textData)};
 
     bool needsRedraw = true;
