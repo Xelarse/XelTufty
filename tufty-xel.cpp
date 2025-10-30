@@ -54,8 +54,7 @@ int main()
     bearIconPosition.y = 0;
 
     ImageData bearIconImageData{};
-    //TODO work out a better interface for these flags it feels shit to use like this.
-    bearIconImageData.mirrorFlags = static_cast<ImageData::MirrorFlags>(ImageData::MirrorFlags::MIRROR_X | ImageData::MirrorFlags::MIRROR_Y);
+    bearIconImageData.mirrorFlags = ImageData::MirrorFlags::MIRROR_X | ImageData::MirrorFlags::MIRROR_Y;
     bearIconImageData.next = reinterpret_cast<LayerData*>(&bearIconPosition);
 
     PositionData textPosition{};
