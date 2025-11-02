@@ -90,7 +90,7 @@ auto ImageLayer::pngDrawCallback(PNGDRAW *pDraw) -> int {
     return 1;
 }
 
-auto ImageLayer::calculatePosition(const pimoroni::Point& startPos, const pimoroni::Point& pos, const pimoroni::Point& dims, Xel::ImageData::MirrorFlags flags) -> pimoroni::Point {
+auto ImageLayer::calculatePosition(const pimoroni::Point& startPos, const pimoroni::Point& pos, const pimoroni::Point& dims, Xel::ImageData::MirrorFlags::Type flags) -> pimoroni::Point {
     pimoroni::Point outPos{0,0};
 
     // If mirrored we need to take the max width / height and progressively step backwards, otherwise just add to standard offset

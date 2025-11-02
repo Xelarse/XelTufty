@@ -1,6 +1,6 @@
 #pragma once
 
-#include "layer.hpp"
+#include "libraries/xel-present/layer.hpp"
 #include "libraries/pngdec/PNGdec.h"
 #include "libraries/pico_graphics/pico_graphics.hpp"
 
@@ -17,7 +17,7 @@ class ImageLayer final : public Xel::Layer {
         ImageLayer() = default;
 
         auto static pngDrawCallback(PNGDRAW* pDraw) -> int;
-        auto static calculatePosition(const pimoroni::Point& startPos, const pimoroni::Point& pos, const pimoroni::Point& dims, Xel::ImageData::MirrorFlags flags) -> pimoroni::Point;
+        auto static calculatePosition(const pimoroni::Point& startPos, const pimoroni::Point& pos, const pimoroni::Point& dims, Xel::ImageData::MirrorFlags::Type flags) -> pimoroni::Point;
 
         PNG png;
         int pngOpenStatus = -1;

@@ -64,6 +64,7 @@ target_link_libraries(${PROJECT_NAME}
     st7789
     button
     pngdec
+    xel-present
 )
 
 pico_add_extra_outputs(${PROJECT_NAME})
