@@ -41,7 +41,6 @@ namespace Xel {
             static constexpr Type MAX = 1 << 7;
         };
 
-
         ImageData() : LayerData{LayerDataType::IMAGE} {}
         ~ImageData() override = default;
 
@@ -86,6 +85,7 @@ namespace Xel {
             Layer(pimoroni::PicoGraphics* gc) : context{gc} {};
 
             // FIXME: Should this be a shared ptr? Dont think we want heap on an embedded device so a raw ptr to the object should be fine.
+            // FIXME: Should really make a graphics context abstraction for this so we arent hard coupled to PicoGraphics.
             pimoroni::PicoGraphics* context = nullptr;
 
         private:
