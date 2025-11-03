@@ -13,11 +13,11 @@
 #include "include/layers/imageLayer.hpp"
 #include "include/layers/textLayer.hpp"
 
+#include <iostream>
+
 using namespace pimoroni;
 
 // Tufty is 320 x 240 with 133mhz cpu with 264kb of sram
-// input range is 3v - 5.5v
-
 Tufty2040 tufty;
 
 ST7789 st7789(
@@ -73,7 +73,7 @@ int main()
 
     bool needsRedraw = true;
     while (true)
-    {
+    {        
         if (needsRedraw)
         {
             bpb.update();
@@ -83,6 +83,9 @@ int main()
             // needsRedraw = false;
         }
         // TODO: sleep logic here to save power
+
+        // FIXME: Voltage read always 0
+        std::cout << "Voltage: " << tufty.rawVoltage() << std::endl;
     }
 
     return 0;

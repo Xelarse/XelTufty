@@ -19,18 +19,31 @@ namespace Xel {
     };
 
     struct ButtonEvent final : public Event {
+        enum class Button {
+            NONE,
+            A,
+            B,
+            C,
+            UP,
+            DOWN
+        };
+
         ButtonEvent() : Event{EventType::BUTTON} {};
         ~ButtonEvent() override = default;
+
+        Button pressedButton = Button::NONE;
     };
 
     struct LightEvent final : public Event {
         LightEvent() : Event{EventType::PHOTO_RESISTOR} {};
         ~LightEvent() override = default;
+        uint16_t luminence;
     };
 
     struct VoltageEvent final : public Event {
         VoltageEvent() : Event{EventType::VOLTAGE} {};
         ~VoltageEvent() override = default;
+        double voltage;
     };
 
     class Scene {

@@ -5,6 +5,7 @@
 
 #include "hardware/gpio.h"  // Workaround SDK bug - https://github.com/raspberrypi/pico-sdk/issues/3
 #include "hardware/pwm.h"
+#include "hardware/adc.h"
 
 namespace pimoroni {
 
@@ -27,6 +28,14 @@ namespace pimoroni {
     static const uint8_t LCD_RD = 13;
     static const uint8_t LCD_D0 = 14;
 
+  private:
+    static const uint8_t vbat_adc = 29;
+    static const uint8_t vref_adc = 28;
+    static const uint8_t vbat_input = 3;
+    static const uint8_t vref_input = 2;
+    static const uint8_t vref_en = 27;
+    static const uint8_t usb_power = 24;
+
   public:
     Tufty2040() {
       
@@ -45,6 +54,13 @@ namespace pimoroni {
       pwm_init(pwm_gpio_to_slice_num(LED), &cfg, true);
       gpio_set_function(LED, GPIO_FUNC_PWM);
       led(0);
+
+      // Power related preamble
+      gpio_set_dir(vref_en, true);    // sets vref to a pin.OUT so we can set it for reading later
+      gpio_set_dir(usb_power, false); // sets usb power pin to pin.IN so we can read it for usb powering vs bat.
+      adc_init();                     // Init the ADC interface
+      adc_gpio_init(vbat_adc);        // Initialise  our 
+      adc_gpio_init(vref_adc);
     }
 
     void led(uint8_t brightness) {
@@ -54,6 +70,30 @@ namespace pimoroni {
       pwm_set_gpio_level(LED, v);
     }
 
-  };
+    double rawVoltage() {
+        // Enable vref reading
+        gpio_pull_up(vref_en);
 
+        // Read out vref and vbat vals
+        adc_select_input(vref_input);
+        const auto vrefRead = adc_read();
+
+        adc_select_input(vbat_input);
+        const auto vbatRead = adc_read();
+
+        // Disable vref reading
+        gpio_pull_down(vref_en);
+
+        // Calculate voltage assuming
+        // TODO actually figure our wtf al this means
+        const auto vdd = 1.24 * (65535 / vrefRead);
+        const auto vbat = (vbatRead / 65535) * 3 * vdd;
+
+        return vbat;
+    }
+
+    bool isUsbPowered() {
+      return gpio_get(usb_power);
+    }
+  };
 }
