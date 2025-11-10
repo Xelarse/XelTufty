@@ -44,6 +44,8 @@ namespace Xel {
         VoltageEvent() : Event{EventType::VOLTAGE} {};
         ~VoltageEvent() override = default;
         double voltage;
+        float percentage;
+        bool isUsbPowered;
     };
 
     class Scene {

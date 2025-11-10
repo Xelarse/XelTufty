@@ -14,6 +14,7 @@
 #include "include/layers/textLayer.hpp"
 
 #include <iostream>
+#include <algorithm>
 
 using namespace pimoroni;
 
@@ -42,11 +43,31 @@ Button button_c(Tufty2040::C, Polarity::ACTIVE_HIGH);
 Button button_up(Tufty2040::UP, Polarity::ACTIVE_HIGH);
 Button button_down(Tufty2040::DOWN, Polarity::ACTIVE_HIGH);
 
+
+// Lifted and shifted from pimoroni example and adapted to c++
+auto autoBrightness(uint16_t luminance, uint8_t prevBacklight) -> uint8_t {
+    static constexpr uint16_t LUM_LOW = 384;
+    static constexpr uint16_t LUM_HIGH = 2048;
+    static constexpr uint8_t BACKLIGHT_LOW = 100;
+    static constexpr uint8_t BACKLIGHT_HIGH = 255;
+
+    auto luminance_frac = std::max(0.f, static_cast<float>(luminance) - LUM_LOW);
+    luminance_frac = std::min(1.f, luminance_frac / (static_cast<float>(LUM_HIGH) - LUM_LOW));
+    auto backlight = BACKLIGHT_LOW + (luminance_frac * (BACKLIGHT_HIGH - BACKLIGHT_LOW)); // TODO if this doesnt work likely need float casts
+    // Use the previous value to smooth out changes to reduce flickering.
+    // The "32" value here controls how quickly it reacts (larger = slower).
+    // The rate at which the main loop calls us also affects that!
+    auto backlight_diff = backlight - prevBacklight;
+    backlight = prevBacklight + (backlight_diff * (1.f / 32.f));
+    return backlight;
+}
+
 int main()
 {
     using namespace Xel;
 
     stdio_init_all();
+    // Backlight range is from 100-255, lower than 100 seems to just black screen.
     st7789.set_backlight(255);
     
     PositionData bearIconPosition{};
@@ -85,7 +106,8 @@ int main()
         // TODO: sleep logic here to save power
 
         // FIXME: Voltage read always 0
-        std::cout << "Voltage: " << tufty.rawVoltage() << std::endl;
+        const auto [voltage, percentage, isUsbPowered] = tufty.readBattery();
+        std::cout << "Voltage: " << voltage << ", Percentage: " << percentage << std::endl;
     }
 
     return 0;
