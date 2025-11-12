@@ -5,18 +5,21 @@ ImageLayer::ImageLayer(pimoroni::PicoGraphics* gc, uint8_t* pngData, int pngData
     pngOpenStatus = png.openRAM(pngData, pngDataSize, ImageLayer::pngDrawCallback);
 }
 
+ImageLayer::ImageLayer(pimoroni::PicoGraphics* gc, Xel::LayerData* layerData, uint8_t* pngData, int pngDataSize) : Layer{gc}
+{
+    processDataChain(layerData);
+    pngOpenStatus = png.openRAM(pngData, pngDataSize, ImageLayer::pngDrawCallback);
+}
+
 ImageLayer::~ImageLayer()
 {
     png.close();
 }
 
-auto ImageLayer::update(Xel::LayerData* layerData) -> void {
-    if (!context) { return; }
-    if (pngOpenStatus != PNG_SUCCESS) { return; }
-
+auto ImageLayer::processDataChain(Xel::LayerData * layerData) -> void
+{
     // TODO: add struct chain traversal helper when its written
     auto currentLayer = layerData;
-
     while(currentLayer) {
         switch(currentLayer->type) {
             case Xel::LayerDataType::IMAGE: {
@@ -31,7 +34,13 @@ auto ImageLayer::update(Xel::LayerData* layerData) -> void {
 
         currentLayer = currentLayer->next;
     }
+}
 
+auto ImageLayer::update(Xel::LayerData* layerData) -> void {
+    if (!context) { return; }
+    if (pngOpenStatus != PNG_SUCCESS) { return; }
+
+    processDataChain(layerData);
     png.decode(reinterpret_cast<void*>(this), 0);
 }
 

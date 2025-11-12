@@ -49,10 +49,11 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 )
 
 target_sources(${PROJECT_NAME} PRIVATE
-  ${CMAKE_CURRENT_LIST_DIR}/src/shapesDemoLayer.cpp
-  ${CMAKE_CURRENT_LIST_DIR}/src/bearPawBackgroundLayer.cpp
-  ${CMAKE_CURRENT_LIST_DIR}/src/imageLayer.cpp
-  ${CMAKE_CURRENT_LIST_DIR}/src/textLayer.cpp
+  ${CMAKE_CURRENT_LIST_DIR}/src/layers/shapesDemoLayer.cpp
+  ${CMAKE_CURRENT_LIST_DIR}/src/layers/bearPawBackgroundLayer.cpp
+  ${CMAKE_CURRENT_LIST_DIR}/src/layers/imageLayer.cpp
+  ${CMAKE_CURRENT_LIST_DIR}/src/layers/textLayer.cpp
+  ${CMAKE_CURRENT_LIST_DIR}/src/scenes/sonaScene.cpp
 )
 
 

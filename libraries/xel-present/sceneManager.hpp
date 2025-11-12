@@ -5,7 +5,7 @@
 namespace xel {
     class SceneManager final {
         public:
-            SceneManager(pimoroni::PicoGraphics* context) : context{context} {};
+            SceneManager(pimoroni::PicoGraphics* gc) : context{gc} {};
             ~SceneManager() = default;
 
             auto update(Xel::Event* eventChain) -> void;

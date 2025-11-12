@@ -6,7 +6,6 @@ class TextLayer final : public Xel::Layer {
     public:
         TextLayer(pimoroni::PicoGraphics* gc) : Layer{gc} {};
         TextLayer(pimoroni::PicoGraphics* gc, Xel::LayerData* layerData);
-        ~TextLayer() override = default;
 
         auto update(Xel::LayerData* layerData = nullptr) -> void override;
 

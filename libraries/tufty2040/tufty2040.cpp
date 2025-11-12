@@ -37,7 +37,7 @@ namespace pimoroni {
         pwm_set_gpio_level(LED, v);
     }
 
-    auto Tufty2040::readAmbientLightScale() -> uint16_t
+    auto Tufty2040::readAmbientLightScale() -> float
     {
         static constexpr uint8_t LOW_LUX = 60;
         static constexpr uint8_t HIGH_LUX = 73;

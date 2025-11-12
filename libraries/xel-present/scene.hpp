@@ -51,10 +51,11 @@ namespace Xel {
     class Scene {
         public:
             virtual ~Scene() = default;
-            Scene(Scene& lhs) = delete;
-            Scene(Scene&& lhs) = delete;
-            Scene& operator=(Scene& rhs) = delete;
-            Scene&& operator=(Scene&& rhs) = delete;
+            Scene(const Scene& lhs) = default;
+            Scene& operator=(const Scene& rhs) = default;
+            // Shallow copy of ptr since it isn't an owned ptr
+            Scene(Scene&& lhs) : context{lhs.context} {}; 
+            Scene& operator=(Scene&& rhs) { context = rhs.context; return *this; };
 
             virtual auto update(Event* eventChain = nullptr) -> void = 0;
 

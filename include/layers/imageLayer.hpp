@@ -9,6 +9,7 @@ class ImageLayer final : public Xel::Layer {
     public:
         // TODO: Add constructor to also load image data from a file.
         ImageLayer(pimoroni::PicoGraphics* gc, uint8_t* pngData, int pngDataSize);
+        ImageLayer(pimoroni::PicoGraphics* gc, Xel::LayerData* layerData, uint8_t* pngData, int pngDataSize);
         ~ImageLayer() override;
 
         auto update(Xel::LayerData* layerData = nullptr) -> void override;
@@ -16,6 +17,7 @@ class ImageLayer final : public Xel::Layer {
     private:
         ImageLayer() = default;
 
+        auto processDataChain(Xel::LayerData* layerData) -> void;
         auto static pngDrawCallback(PNGDRAW* pDraw) -> int;
         auto static calculatePosition(const pimoroni::Point& startPos, const pimoroni::Point& pos, const pimoroni::Point& dims, Xel::ImageData::MirrorFlags::Type flags) -> pimoroni::Point;
 

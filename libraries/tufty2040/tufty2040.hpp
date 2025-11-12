@@ -41,7 +41,7 @@ namespace pimoroni {
     ~Tufty2040() = default;
 
     auto led(uint8_t brightness) -> void;
-    auto readAmbientLightScale() -> uint16_t;
+    auto readAmbientLightScale() -> float;
     auto readBattery() -> std::tuple<double, float, bool>; // <rawVoltage, batteryPercent, usbPowered>
     auto update() -> void;
     auto render(pimoroni::PicoGraphics* context) -> void;

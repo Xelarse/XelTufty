@@ -74,10 +74,11 @@ namespace Xel {
     class Layer {
         public:
             virtual ~Layer() = default;
-            Layer(Layer& lhs) = delete;
-            Layer(Layer&& lhs) = delete;
-            Layer& operator=(Layer& rhs) = delete;
-            Layer&& operator=(Layer&& rhs) = delete;
+            Layer(const Layer& lhs) = default;
+            Layer& operator=(const Layer& rhs) = default;
+            // Shallow copy on a move since ptr isn't owned
+            Layer(Layer&& lhs) : context{lhs.context} {};
+            Layer& operator=(Layer&& rhs) { context = rhs.context; return *this; };
 
             virtual auto update(LayerData* layerData = nullptr) -> void = 0;
 

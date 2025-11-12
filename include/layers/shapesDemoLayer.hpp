@@ -6,7 +6,6 @@
 class ShapesDemoLayer final : public Xel::Layer {
     public:
         ShapesDemoLayer(pimoroni::PicoGraphics* gc, uint8_t shapeCount);
-        ~ShapesDemoLayer() override = default;
 
         auto update(Xel::LayerData* layerData = nullptr) -> void override;
 
