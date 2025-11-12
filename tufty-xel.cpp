@@ -3,10 +3,8 @@
 #include "pico/platform.h"
 
 #include "common/pimoroni_common.hpp"
-#include "drivers/st7789/st7789.hpp"
-#include "drivers/button/button.hpp"
-#include "libraries/pico_graphics/pico_graphics.hpp"
 #include "libraries/tufty2040/tufty2040.hpp"
+#include "libraries/pico_graphics/pico_graphics.hpp"
 
 #include "include/images/icon240x240.h"
 #include "include/layers/bearPawBackgroundLayer.hpp"
@@ -17,52 +15,7 @@ using namespace pimoroni;
 
 // Tufty is 320 x 240 with 133mhz cpu with 264kb of sram
 Tufty2040 tufty;
-
-ST7789 st7789(
-    Tufty2040::WIDTH,
-    Tufty2040::HEIGHT,
-    ROTATE_0,
-    ParallelPins{
-        Tufty2040::LCD_CS,
-        Tufty2040::LCD_DC,
-        Tufty2040::LCD_WR,
-        Tufty2040::LCD_RD,
-        Tufty2040::LCD_D0,
-        Tufty2040::BACKLIGHT
-    }
-);
-
-PicoGraphics_PenRGB556 graphics(st7789.width, st7789.height, nullptr);
-
-Button button_a(Tufty2040::A, Polarity::ACTIVE_HIGH);
-Button button_b(Tufty2040::B, Polarity::ACTIVE_HIGH);
-Button button_c(Tufty2040::C, Polarity::ACTIVE_HIGH);
-Button button_up(Tufty2040::UP, Polarity::ACTIVE_HIGH);
-Button button_down(Tufty2040::DOWN, Polarity::ACTIVE_HIGH);
-
-auto autoBrightness(float ambientScale) -> uint8_t {
-    // Backlight range is from 100-255, lower than 100 seems to just black screen.
-    static constexpr uint8_t BACKLIGHT_LOW = 200;
-    static constexpr uint8_t BACKLIGHT_HIGH = 255;
-    static float previousBacklight = 0;
-
-    const auto backlightLerp = [](float t) -> float {
-        return BACKLIGHT_LOW + (BACKLIGHT_HIGH - BACKLIGHT_LOW) * t;
-    };
-
-    // On bootup to save waiting for the light to change just set it immediately.
-    if (previousBacklight == 0) {
-        previousBacklight = backlightLerp(ambientScale);
-        return previousBacklight;
-    }
-
-    // Use the previous value to smooth out changes to reduce flickering.
-    const float backlight_diff = backlightLerp(ambientScale) - previousBacklight;
-    const float backlight = previousBacklight + (backlight_diff * (1.f / 2.f)); // 2 affects smoothing, lower number = faster
-    previousBacklight = backlight;
-
-    return backlight;
-}
+PicoGraphics_PenRGB556 graphics(Tufty2040::WIDTH, Tufty2040::HEIGHT, nullptr);
 
 int main()
 {
@@ -100,8 +53,8 @@ int main()
             bpb.update();
             bearImage.update(reinterpret_cast<LayerData*>(&bearIconImageData));
             xelText.update();
-            st7789.set_backlight(autoBrightness(tufty.readAmbientLightScale()));
-            st7789.update(&graphics);
+            tufty.update();
+            tufty.render(&graphics);
             // needsRedraw = false;
         }
         // TODO: sleep logic here to save power

@@ -59,10 +59,7 @@ target_sources(${PROJECT_NAME} PRIVATE
 target_link_libraries(${PROJECT_NAME}
     pico_stdlib
     tufty2040
-    hardware_spi
     pico_graphics
-    st7789
-    button
     pngdec
     xel-present
 )
