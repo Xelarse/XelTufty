@@ -13,9 +13,6 @@
 #include "include/layers/imageLayer.hpp"
 #include "include/layers/textLayer.hpp"
 
-#include <iostream>
-#include <algorithm>
-
 using namespace pimoroni;
 
 // Tufty is 320 x 240 with 133mhz cpu with 264kb of sram
@@ -43,22 +40,27 @@ Button button_c(Tufty2040::C, Polarity::ACTIVE_HIGH);
 Button button_up(Tufty2040::UP, Polarity::ACTIVE_HIGH);
 Button button_down(Tufty2040::DOWN, Polarity::ACTIVE_HIGH);
 
-
-// Lifted and shifted from pimoroni example and adapted to c++
-auto autoBrightness(uint16_t luminance, uint8_t prevBacklight) -> uint8_t {
-    static constexpr uint16_t LUM_LOW = 384;
-    static constexpr uint16_t LUM_HIGH = 2048;
-    static constexpr uint8_t BACKLIGHT_LOW = 100;
+auto autoBrightness(float ambientScale) -> uint8_t {
+    // Backlight range is from 100-255, lower than 100 seems to just black screen.
+    static constexpr uint8_t BACKLIGHT_LOW = 200;
     static constexpr uint8_t BACKLIGHT_HIGH = 255;
+    static float previousBacklight = 0;
 
-    auto luminance_frac = std::max(0.f, static_cast<float>(luminance) - LUM_LOW);
-    luminance_frac = std::min(1.f, luminance_frac / (static_cast<float>(LUM_HIGH) - LUM_LOW));
-    auto backlight = BACKLIGHT_LOW + (luminance_frac * (BACKLIGHT_HIGH - BACKLIGHT_LOW)); // TODO if this doesnt work likely need float casts
+    const auto backlightLerp = [](float t) -> float {
+        return BACKLIGHT_LOW + (BACKLIGHT_HIGH - BACKLIGHT_LOW) * t;
+    };
+
+    // On bootup to save waiting for the light to change just set it immediately.
+    if (previousBacklight == 0) {
+        previousBacklight = backlightLerp(ambientScale);
+        return previousBacklight;
+    }
+
     // Use the previous value to smooth out changes to reduce flickering.
-    // The "32" value here controls how quickly it reacts (larger = slower).
-    // The rate at which the main loop calls us also affects that!
-    auto backlight_diff = backlight - prevBacklight;
-    backlight = prevBacklight + (backlight_diff * (1.f / 32.f));
+    const float backlight_diff = backlightLerp(ambientScale) - previousBacklight;
+    const float backlight = previousBacklight + (backlight_diff * (1.f / 2.f)); // 2 affects smoothing, lower number = faster
+    previousBacklight = backlight;
+
     return backlight;
 }
 
@@ -67,8 +69,6 @@ int main()
     using namespace Xel;
 
     stdio_init_all();
-    // Backlight range is from 100-255, lower than 100 seems to just black screen.
-    st7789.set_backlight(255);
     
     PositionData bearIconPosition{};
     bearIconPosition.x = 0;
@@ -94,20 +94,17 @@ int main()
 
     bool needsRedraw = true;
     while (true)
-    {        
+    {
         if (needsRedraw)
         {
             bpb.update();
             bearImage.update(reinterpret_cast<LayerData*>(&bearIconImageData));
             xelText.update();
+            st7789.set_backlight(autoBrightness(tufty.readAmbientLightScale()));
             st7789.update(&graphics);
             // needsRedraw = false;
         }
         // TODO: sleep logic here to save power
-
-        // FIXME: Voltage read always 0
-        const auto [voltage, percentage, isUsbPowered] = tufty.readBattery();
-        std::cout << "Voltage: " << voltage << ", Percentage: " << percentage << std::endl;
     }
 
     return 0;

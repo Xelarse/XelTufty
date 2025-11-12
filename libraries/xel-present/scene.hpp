@@ -6,7 +6,7 @@ namespace Xel {
     enum class EventType {
         NONE,
         BUTTON,
-        PHOTO_RESISTOR,
+        AMBIENT_LIGHT,
         VOLTAGE
     };
 
@@ -34,10 +34,10 @@ namespace Xel {
         Button pressedButton = Button::NONE;
     };
 
-    struct LightEvent final : public Event {
-        LightEvent() : Event{EventType::PHOTO_RESISTOR} {};
-        ~LightEvent() override = default;
-        uint16_t luminence;
+    struct AmbientLightEvent final : public Event {
+        AmbientLightEvent() : Event{EventType::AMBIENT_LIGHT} {};
+        ~AmbientLightEvent() override = default;
+        float scale;
     };
 
     struct VoltageEvent final : public Event {
