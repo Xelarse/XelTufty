@@ -20,7 +20,12 @@ auto TextLayer::update(Xel::LayerData* layerData) -> void
     );
 }
 
-auto TextLayer::processDataChain(Xel::LayerData* layerData) -> void
+auto TextLayer::setColour(Xel::RGB rgb) -> void
+{
+    lastTextData.col = rgb;
+}
+
+auto TextLayer::processDataChain(Xel::LayerData *layerData) -> void
 {
     auto currentLayer = layerData;
     while(currentLayer) {

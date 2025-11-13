@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vector>
-#include <variant>
+#include <memory>
 
 #include "libraries/xel-present/scene.hpp"
 #include "libraries/xel-present/layer.hpp"
@@ -18,7 +18,5 @@ class SonaScene final : public Xel::Scene {
     private:
         SonaScene() = default;
 
-        // Predefine layer variants to avoid additional heap allocations for indirection.
-        using LayerVariant = std::variant<BearPawBackgroundLayer, ImageLayer, TextLayer>;
-        std::vector<LayerVariant> renderLayers{};
+        std::vector<std::unique_ptr<Xel::Layer>> renderLayers{};
 };

@@ -9,6 +9,8 @@ class TextLayer final : public Xel::Layer {
 
         auto update(Xel::LayerData* layerData = nullptr) -> void override;
 
+        auto setColour(Xel::RGB rgb) -> void;
+
     private:
         TextLayer() = default;
 

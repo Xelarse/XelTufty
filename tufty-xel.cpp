@@ -18,13 +18,14 @@ int main()
 {
     stdio_init_all();
 
-    // SonaScene sonaScene{&graphics};
-    BearPawBackgroundLayer bpb{&graphics};
+    SonaScene sonaScene{&graphics};
 
     while (true)
     {
-        // sonaScene.update();
-        bpb.update();
+        Xel::AmbientLightEvent lightEvent{};
+        lightEvent.scale = tufty.readAmbientLightScale();
+
+        sonaScene.update(reinterpret_cast<Xel::Event*>(&lightEvent));
         tufty.update();
         tufty.render(&graphics);
         // needsRedraw = false;

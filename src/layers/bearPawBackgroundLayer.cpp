@@ -5,15 +5,16 @@ auto BearPawBackgroundLayer::update(Xel::LayerData* layerData) -> void
 {
     if (!context) { return; }
 
-    // FIXME:: gotta be a better way to map these values? Maybe concepts after figuring out unsigned int size vs 3 uint8s
-    context->set_pen(Xel::bearFlesh.r, Xel::bearFlesh.g, Xel::bearFlesh.b);
+    const auto& bg = !darkmode ? primary : secondary;
+    context->set_pen(bg.r, bg.g, bg.b);
     context->clear();
 
 
     int screenWidth = context->bounds.w;
     int screenHeight = context->bounds.h;
 
-    context->set_pen(Xel::bearNose.r, Xel::bearNose.g, Xel::bearNose.b);
+    const auto& accent = !darkmode ? secondary : primary;
+    context->set_pen(accent.r, accent.g, accent.b);
 
     // Middle Base
     context->circle(pimoroni::Point{screenWidth/2, -40}, 100);
