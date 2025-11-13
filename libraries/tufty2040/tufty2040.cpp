@@ -27,7 +27,9 @@ namespace pimoroni {
         gpio_set_dir(USB_POWER, false);       // sets usb power pin to pin.IN so we can read it for usb powering vs bat.
         adc_init();                           // Init the ADC interface
         adc_gpio_init(VBAT_ADC);              // Initialise our adc's for reading later
-        adc_gpio_init(LUX_ADC);        
+        adc_gpio_init(LUX_ADC);
+
+        st7789 = std::make_unique<ST7789>(WIDTH, HEIGHT, ROTATE_0, ParallelPins{ LCD_CS, LCD_DC, LCD_WR, LCD_RD, LCD_D0, BACKLIGHT });
     }
 
     auto Tufty2040::led(uint8_t brightness) -> void {
@@ -74,12 +76,12 @@ namespace pimoroni {
 
     auto Tufty2040::update() -> void
     {
-        st7789.set_backlight(autoBrightness());
+        st7789->set_backlight(autoBrightness());
     }
 
     auto Tufty2040::render(pimoroni::PicoGraphics* context) -> void
     {
-        st7789.update(context);
+        st7789->update(context);
     }
 
     auto Tufty2040::autoBrightness() -> uint8_t {

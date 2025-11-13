@@ -2,6 +2,7 @@
 
 #include <math.h>
 #include <tuple>
+#include <memory>
 
 #include "hardware/gpio.h"  // Workaround SDK bug - https://github.com/raspberrypi/pico-sdk/issues/3
 #include "hardware/pwm.h"
@@ -57,7 +58,7 @@ namespace pimoroni {
     Button buttonC{C, Polarity::ACTIVE_HIGH, 0};
     Button buttonUp{UP, Polarity::ACTIVE_HIGH, 0};
     Button buttonDown{DOWN, Polarity::ACTIVE_HIGH, 0};
-    ST7789 st7789{ WIDTH, HEIGHT, ROTATE_0, ParallelPins{ LCD_CS, LCD_DC, LCD_WR, LCD_RD, LCD_D0, BACKLIGHT }};
+    std::unique_ptr<ST7789> st7789; // FIXME: find a way to late init this without its default constructor.
 
     auto autoBrightness() -> uint8_t;
     auto calculateVoltageScale(double voltage) -> float;    

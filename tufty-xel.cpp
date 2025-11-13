@@ -6,35 +6,34 @@
 #include "libraries/pico_graphics/pico_graphics.hpp"
 
 #include "include/scenes/sonaScene.hpp"
+#include "include/layers/bearPawBackgroundLayer.hpp"
 
 using namespace pimoroni;
+
+// Tufty is 320 x 240 with 133mhz cpu with 264kb of sram
+Tufty2040 tufty{};
+PicoGraphics_PenRGB556 graphics{Tufty2040::WIDTH, Tufty2040::HEIGHT, nullptr};
 
 int main()
 {
     stdio_init_all();
 
-    // Tufty is 320 x 240 with 133mhz cpu with 264kb of sram
-    Tufty2040 tufty{};
-    PicoGraphics_PenRGB556 graphics{Tufty2040::WIDTH, Tufty2040::HEIGHT, nullptr};
-    SonaScene sonaScene{&graphics};
+    // SonaScene sonaScene{&graphics};
+    BearPawBackgroundLayer bpb{&graphics};
 
-    bool needsRedraw = true;
     while (true)
     {
-        if (needsRedraw)
-        {
-            sonaScene.update();
-            tufty.update();
-            tufty.render(&graphics);
-            // needsRedraw = false;
-        }
-        // TODO: sleep logic here to save power
+        // sonaScene.update();
+        bpb.update();
+        tufty.update();
+        tufty.render(&graphics);
+        // needsRedraw = false;
     }
 
     return 0;
 }
 
-
+// TODO: sleep logic to save power
 // Timer WIP----------------------------------------------
 // template<class Resolution, class Step>
 // auto timestampDifference(const std::chrono::steady_clock::time_point& before, const std::chrono::steady_clock::time_point& after) -> double {
