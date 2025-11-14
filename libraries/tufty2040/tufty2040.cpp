@@ -104,7 +104,7 @@ namespace pimoroni {
 
         // Use the previous value to smooth out changes to reduce flickering.
         const float backlight_diff = backlightLerp(ambientScale) - previousBacklight;
-        const float backlight = previousBacklight + (backlight_diff * (1.f / 2.f)); // 2 affects smoothing, lower number = faster
+        const float backlight = previousBacklight + (backlight_diff * (1.f / 5.f)); // 2 affects smoothing, lower number = faster
         previousBacklight = backlight;
 
         return backlight;

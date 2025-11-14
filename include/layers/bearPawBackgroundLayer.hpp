@@ -14,6 +14,6 @@ class BearPawBackgroundLayer final : public Xel::Layer {
         BearPawBackgroundLayer() = default;
 
         bool darkmode = false;
-        const Xel::RGB primary{Xel::bearFlesh.r, Xel::bearFlesh.g, Xel::bearFlesh.b};
-        const Xel::RGB secondary{Xel::bearNose.r, Xel::bearNose.g, Xel::bearNose.b};
+        const Xel::RGB primary{Xel::RGB_CONSTS::BEAR_FLESH};
+        const Xel::RGB secondary{Xel::RGB_CONSTS::BEAR_NOSE};
 };

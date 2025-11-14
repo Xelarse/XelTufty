@@ -1,6 +1,7 @@
 #include "include/scenes/sonaScene.hpp"
 
 #include "include/images/icon240x240.h"
+#include "include/utilities.hpp"
 
 SonaScene::SonaScene(pimoroni::PicoGraphics* gc) : Xel::Scene{gc}
 {
@@ -46,13 +47,14 @@ auto SonaScene::update(Xel::Event* eventChain) -> void
             auto bg = static_cast<BearPawBackgroundLayer*>(renderLayers.front().get());
             auto text = static_cast<TextLayer*>(renderLayers.back().get());
 
+            // TODO: Create a hysterisis generic to manage bouncing of edge values.
             if (ambient->scale < 0.5f) {
                 bg->darkMode(true);
-                text->setColour({255, 255, 255});
+                text->setColour(Xel::RGB_CONSTS::WHITE);
             }
             else {
                 bg->darkMode(false);
-                text->setColour({0, 0, 0});
+                text->setColour(Xel::RGB_CONSTS::BLACK);
             }
             break;
         }
