@@ -48,7 +48,7 @@ auto SonaScene::update(Xel::Event* eventChain) -> void
             auto text = static_cast<TextLayer*>(renderLayers.back().get());
 
             // TODO: Create a hysterisis generic to manage bouncing of edge values.
-            if (ambient->scale < 0.5f) {
+            if (ambient->scale < 0.4f) {
                 bg->darkMode(true);
                 text->setColour(Xel::RGB_CONSTS::WHITE);
             }

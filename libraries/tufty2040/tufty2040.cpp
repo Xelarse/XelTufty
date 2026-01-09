@@ -41,8 +41,14 @@ namespace pimoroni {
 
     auto Tufty2040::readAmbientLightScale() -> float
     {
-        static constexpr uint8_t LOW_LUX = 60;
-        static constexpr uint8_t HIGH_LUX = 73;
+        // 84 is direct sunlight
+        // ~79 is indirecet light but still outside
+        // 72 is indoors mild lighting
+        // below 70 is darker indoor lighting
+
+        //~79 is expected as a daytime average lighting scenario
+        static constexpr uint8_t LOW_LUX = 64;
+        static constexpr uint8_t HIGH_LUX = 84;
 
         const auto calcScale = [](float val) -> float {
             return std::min(std::max(0.0f, (val - LOW_LUX) / (HIGH_LUX - LOW_LUX)), 1.0f);
